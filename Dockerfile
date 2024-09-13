@@ -194,15 +194,19 @@ ARG UID
 ARG CACHE_HOME
 COPY --link --chown=$UID:0 --chmod=775 --from=load_align ${CACHE_HOME} ${CACHE_HOME}
 
+# Copy your source code
+COPY --link --chown=$UID:0 --chmod=775 src /app/src
+
 ARG WHISPER_MODEL
 ENV WHISPER_MODEL=${WHISPER_MODEL}
 ARG LANG
 ENV LANG=${LANG}
 
-# Take the first language from LANG env variable
-ENTRYPOINT [ "dumb-init", "--", "/bin/sh", "-c", "LANG=$(echo ${LANG} | cut -d ' ' -f1); whisperx --model \"${WHISPER_MODEL}\" --language \"${LANG}\" \"$@\"" ]
+# Set the default command to run src/handler.py
+ENTRYPOINT [ "dumb-init", "--", "/bin/sh", "-c", "python3 /app/src/handler.py" ]
 
 ARG VERSION
 ARG RELEASE
 LABEL version=${VERSION} \
     release=${RELEASE}
+
